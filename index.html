@@ -58,7 +58,12 @@
 		<script src="js-struct.js"></script>
 		<!-- Useless for the moment -->
 		<!-- <script src="HermiteCurve3.js"></script> -->
+
+		<!-- Basic Game -->
 		<script src="wipeout.js"></script>
+
+		<!-- Loaders and DataTypes -->
+		<script src="classes/TrackLoader.js"></script>
 
 		<script>
 			var viewer = new Wipeout('container', window.innerWidth, window.innerHeight);
@@ -97,7 +102,7 @@
 
 				addOption(groupWipeout, track.name, (function(track, viewer){
 					viewer.clear();
-					viewer.loadTrack(track.path, track.hasTEXFile);
+					viewer.trackLoader.loadTrack(track.path, track.hasTEXFile);
 				}).bind(null, track));
 			}
 
