@@ -38,7 +38,7 @@ Wipeout.prototype.clear = function() {
 	this.sceneMaterial = {};
 	this.trackMaterial = null;
 	this.weaponTileMaterial = null;
-	
+
 	this.startTime = Date.now();
 	this.ticks = 0;
 };
@@ -46,12 +46,12 @@ Wipeout.prototype.clear = function() {
 Wipeout.prototype.resize = function() {
 	this.width = window.innerWidth;
 	this.height = window.innerHeight;
-	
+
 	this.camera.aspect = this.width / this.height;
 	this.camera.updateProjectionMatrix();
 
 	this.splineCamera.aspect = this.width / this.height;
-	this.splineCamera.updateProjectionMatrix();	
+	this.splineCamera.updateProjectionMatrix();
 
 	this.renderer.setSize( window.innerWidth, window.innerHeight );
 }
@@ -59,25 +59,25 @@ Wipeout.prototype.resize = function() {
 Wipeout.prototype.animate = function() {
 	requestAnimationFrame( this.animate.bind(this) );
 	var time = Date.now();
-	
-	// Update weapon tile color 
+
+	// Update weapon tile color
 	if(this.weaponTileMaterial) {
 		this.updateWeaponMaterial(time);
 	}
 
 	// Camera is in fly mode and we have a spline to follow?
 	if( this.activeCameraMode === 'fly' && this.cameraSpline ) {
-	
+
 		var elapsedTime = time - this.startTime;
 		var elapsedTicks = elapsedTime / 1000 * 60;
 
 		// Fixed time step loop (60hz)
 		while(this.ticks < elapsedTicks) {
-		
+
 			this.updateSplineCamera();
 			this.ticks++;
 		}
-		
+
 		this.rotateSpritesToCamera(this.splineCamera);
 		this.renderer.render(this.scene, this.splineCamera);
 	}
@@ -109,14 +109,14 @@ Wipeout.prototype.updateSplineCamera = function() {
 		.add(lookAtPos.clone().multiplyScalar(1-damping));
 	this.splineCamera.lookAt(this.splineCamera.currentLookAt);
 
-	// Roll into corners - there's probably an easier way to do this. This 
+	// Roll into corners - there's probably an easier way to do this. This
 	// takes the angle between the current camera position and the current
 	// lookAt, applies some damping and rolls the camera along its view vector
 	var cn = cameraPos.sub(this.splineCamera.position);
 	var tn = lookAtPos.sub(this.splineCamera.currentLookAt);
 	var roll = (Math.atan2(cn.z, cn.x) - Math.atan2(tn.z, tn.x));
 	roll += (roll > Math.PI)
-		? -Math.PI*2 
+		? -Math.PI*2
 		: (roll < -Math.PI) ? Math.PI * 2 : 0;
 
 	this.splineCamera.roll = this.splineCamera.roll * 0.95 + (roll)*0.1;
@@ -139,7 +139,7 @@ Wipeout.prototype.updateWeaponMaterial = function(time) {
 	var t = time / 1050;
 	var index = Math.floor(t);
 	var alpha = t - index;
-	
+
 	var colorA = new THREE.Color(colors[index%colors.length]);
 	var colorB = new THREE.Color(colors[(index+1)%colors.length]);
 	this.weaponTileMaterial.color = colorA.lerp(colorB, alpha).multiplyScalar(1.5);
@@ -150,7 +150,7 @@ Wipeout.prototype.updateWeaponMaterial = function(time) {
 
 // .TRV Files ---------------------------------------------
 
-Wipeout.TrackVertex = Struct.create( 
+Wipeout.TrackVertex = Struct.create(
 	Struct.int32('x'),
 	Struct.int32('y'),
 	Struct.int32('z'),
@@ -160,7 +160,7 @@ Wipeout.TrackVertex = Struct.create(
 
 // .TRF Files ---------------------------------------------
 
-Wipeout.TrackFace = Struct.create( 
+Wipeout.TrackFace = Struct.create(
 	Struct.array('indices', Struct.uint16(), 4),
 	Struct.int16('normalx'),
 	Struct.int16('normaly'),
@@ -210,7 +210,7 @@ Wipeout.TrackSection = Struct.create(
 
 // .TEX Files ---------------------------------------------
 
-Wipeout.TrackTexture = Struct.create( 
+Wipeout.TrackTexture = Struct.create(
 	Struct.uint8('tile'),
 	Struct.uint8('flags')
 );
@@ -284,14 +284,14 @@ Wipeout.Polygon[Wipeout.POLYGON_TYPE.UNKNOWN_00] = Struct.create(
 	Struct.array('unknown', Struct.uint16(), 7)
 );
 
-Wipeout.Polygon[Wipeout.POLYGON_TYPE.FLAT_TRIS_FACE_COLOR] = Struct.create( 
+Wipeout.Polygon[Wipeout.POLYGON_TYPE.FLAT_TRIS_FACE_COLOR] = Struct.create(
 	Struct.struct('header', Wipeout.PolygonHeader),
 	Struct.array('indices', Struct.uint16(), 3),
 	Struct.uint16('unknown'),
 	Struct.uint32('color')
 );
 
-Wipeout.Polygon[Wipeout.POLYGON_TYPE.TEXTURED_TRIS_FACE_COLOR] = Struct.create( 
+Wipeout.Polygon[Wipeout.POLYGON_TYPE.TEXTURED_TRIS_FACE_COLOR] = Struct.create(
 	Struct.struct('header', Wipeout.PolygonHeader),
 	Struct.array('indices', Struct.uint16(), 3),
 	Struct.uint16('texture'),
@@ -301,13 +301,13 @@ Wipeout.Polygon[Wipeout.POLYGON_TYPE.TEXTURED_TRIS_FACE_COLOR] = Struct.create(
 	Struct.uint32('color')
 );
 
-Wipeout.Polygon[Wipeout.POLYGON_TYPE.FLAT_QUAD_FACE_COLOR] = Struct.create( 
+Wipeout.Polygon[Wipeout.POLYGON_TYPE.FLAT_QUAD_FACE_COLOR] = Struct.create(
 	Struct.struct('header', Wipeout.PolygonHeader),
 	Struct.array('indices', Struct.uint16(), 4),
 	Struct.uint32('color')
 );
 
-Wipeout.Polygon[Wipeout.POLYGON_TYPE.TEXTURED_QUAD_FACE_COLOR] = Struct.create( 
+Wipeout.Polygon[Wipeout.POLYGON_TYPE.TEXTURED_QUAD_FACE_COLOR] = Struct.create(
 	Struct.struct('header', Wipeout.PolygonHeader),
 	Struct.array('indices', Struct.uint16(), 4),
 	Struct.uint16('texture'),
@@ -317,14 +317,14 @@ Wipeout.Polygon[Wipeout.POLYGON_TYPE.TEXTURED_QUAD_FACE_COLOR] = Struct.create(
 	Struct.uint32('color')
 );
 
-Wipeout.Polygon[Wipeout.POLYGON_TYPE.FLAT_TRIS_VERTEX_COLOR] = Struct.create( 
+Wipeout.Polygon[Wipeout.POLYGON_TYPE.FLAT_TRIS_VERTEX_COLOR] = Struct.create(
 	Struct.struct('header', Wipeout.PolygonHeader),
 	Struct.array('indices', Struct.uint16(), 3),
 	Struct.uint16('unknown'),
 	Struct.array('colors',Struct. uint32(), 3)
 );
 
-Wipeout.Polygon[Wipeout.POLYGON_TYPE.TEXTURED_TRIS_VERTEX_COLOR] = Struct.create( 
+Wipeout.Polygon[Wipeout.POLYGON_TYPE.TEXTURED_TRIS_VERTEX_COLOR] = Struct.create(
 	Struct.struct('header', Wipeout.PolygonHeader),
 	Struct.array('indices', Struct.uint16(), 3),
 	Struct.uint16('texture'),
@@ -334,13 +334,13 @@ Wipeout.Polygon[Wipeout.POLYGON_TYPE.TEXTURED_TRIS_VERTEX_COLOR] = Struct.create
 	Struct.array('colors', Struct.uint32(), 3) // ?
 );
 
-Wipeout.Polygon[Wipeout.POLYGON_TYPE.FLAT_QUAD_VERTEX_COLOR] = Struct.create( 
+Wipeout.Polygon[Wipeout.POLYGON_TYPE.FLAT_QUAD_VERTEX_COLOR] = Struct.create(
 	Struct.struct('header', Wipeout.PolygonHeader),
 	Struct.array('indices', Struct.uint16(), 4),
 	Struct.array('colors', Struct.uint32(), 4)
 );
 
-Wipeout.Polygon[Wipeout.POLYGON_TYPE.TEXTURED_QUAD_VERTEX_COLOR] = Struct.create( 
+Wipeout.Polygon[Wipeout.POLYGON_TYPE.TEXTURED_QUAD_VERTEX_COLOR] = Struct.create(
 	Struct.struct('header', Wipeout.PolygonHeader),
 	Struct.array('indices', Struct.uint16(), 4),
 	Struct.uint16('texture'),
@@ -350,7 +350,7 @@ Wipeout.Polygon[Wipeout.POLYGON_TYPE.TEXTURED_QUAD_VERTEX_COLOR] = Struct.create
 	Struct.array('colors', Struct.uint32(), 4)
 );
 
-Wipeout.Polygon[Wipeout.POLYGON_TYPE.SPRITE_TOP_ANCHOR] = Struct.create( 
+Wipeout.Polygon[Wipeout.POLYGON_TYPE.SPRITE_TOP_ANCHOR] = Struct.create(
 	Struct.struct('header', Wipeout.PolygonHeader),
 	Struct.uint16('index'),
 	Struct.uint16('width'),
@@ -359,7 +359,7 @@ Wipeout.Polygon[Wipeout.POLYGON_TYPE.SPRITE_TOP_ANCHOR] = Struct.create(
 	Struct.uint32('color')
 );
 
-Wipeout.Polygon[Wipeout.POLYGON_TYPE.SPRITE_BOTTOM_ANCHOR] = 
+Wipeout.Polygon[Wipeout.POLYGON_TYPE.SPRITE_BOTTOM_ANCHOR] =
 	Wipeout.Polygon[Wipeout.POLYGON_TYPE.SPRITE_TOP_ANCHOR];
 
 
@@ -402,7 +402,7 @@ Wipeout.prototype.loadBinary = function(url, callback) {
 
 	if( req.overrideMimeType ) {
 		req.overrideMimeType('text/plain; charset=x-user-defined');
-	} 
+	}
 	else {
 		req.setRequestHeader('Accept-Charset', 'x-user-defined');
 	}
@@ -463,7 +463,7 @@ Wipeout.prototype.readObject = function(buffer, offset) {
 
 	var header = Wipeout.ObjectHeader.readStructs(buffer, offset, 1)[0];
 	offset += Wipeout.ObjectHeader.byteLength;
-	
+
 	var vertices = Wipeout.Vertex.readStructs(buffer, offset, header.vertexCount);
 	offset += Wipeout.Vertex.byteLength * header.vertexCount;
 
@@ -508,16 +508,16 @@ Wipeout.prototype.createModelFromObject = function(object, spriteCollection) {
 	// Create faces
 	for( var i = 0; i < object.polygons.length; i++ ) {
 		var p = object.polygons[i];
-		
+
 		// Sprite
 		if(
 			p.header.type === Wipeout.POLYGON_TYPE.SPRITE_BOTTOM_ANCHOR ||
-			p.header.type === Wipeout.POLYGON_TYPE.SPRITE_TOP_ANCHOR 
+			p.header.type === Wipeout.POLYGON_TYPE.SPRITE_TOP_ANCHOR
 		) {
 			var v = geometry.vertices[p.index];
 			var color = this.int32ToColor( p.color );
-			var yOffset = p.header.type === Wipeout.POLYGON_TYPE.SPRITE_BOTTOM_ANCHOR 
-				? p.height/2 
+			var yOffset = p.header.type === Wipeout.POLYGON_TYPE.SPRITE_BOTTOM_ANCHOR
+				? p.height/2
 				: -p.height/2;
 
 			// We can't use THREE.Sprite here, because they rotate to the camera on
@@ -530,7 +530,7 @@ Wipeout.prototype.createModelFromObject = function(object, spriteCollection) {
 			sprite.add( spriteMesh );
 			model.add(sprite);
 
-			// We have to collect sprites separately, so we can go through all of them 
+			// We have to collect sprites separately, so we can go through all of them
 			// and rotate them to the camera before rendering the frame
 			spriteCollection.push( sprite );
 		}
@@ -544,7 +544,7 @@ Wipeout.prototype.createModelFromObject = function(object, spriteCollection) {
 			// Textured
 			if( typeof(p.texture) !== 'undefined' ) {
 				materialIndex = p.texture;
-				
+
 				var img = this.sceneMaterial.materials[materialIndex].map.image;
 				for( var j = 0; j < p.uv.length; j++ ) {
 					uv[j] = new THREE.Vector2(p.uv[j].u/img.width, 1-p.uv[j].v/img.height);
@@ -565,7 +565,7 @@ Wipeout.prototype.createModelFromObject = function(object, spriteCollection) {
 			if( p.indices.length === 4 ) {
 				geometry.faceVertexUvs[0].push([uv[2], uv[3], uv[1]]);
 				geometry.faces.push( new THREE.Face3(p.indices[2], p.indices[3], p.indices[1], null, [c[2], c[3], c[1]], materialIndex) );
-			}			
+			}
 		}
 	}
 
@@ -670,7 +670,7 @@ Wipeout.prototype.unpackImages = function(buffer) {
 		var fileLength = data.getUint32((i+1)*4, true);
 		files.push( dst.buffer.slice(fileOffset, fileOffset + fileLength) );
 		fileOffset += fileLength;
-		
+
 	}
 
 	return files;
@@ -686,7 +686,7 @@ Wipeout.prototype.readImage = function(buffer) {
 	var offset = Wipeout.ImageFileHeader.byteLength;
 
 	var palette = null;
-	if( 
+	if(
 		file.type === Wipeout.IMAGE_TYPE.PALETTED_4_BPP ||
 		file.type === Wipeout.IMAGE_TYPE.PALETTED_8_BPP
 	) {
@@ -705,7 +705,7 @@ Wipeout.prototype.readImage = function(buffer) {
 
 	var dim = Wipeout.ImagePixelHeader.readStructs(buffer, offset, 1)[0];
 	offset += Wipeout.ImagePixelHeader.byteLength;
-	
+
 	var width = dim.width * pixelsPerShort,
 		height = dim.height;
 
@@ -768,10 +768,10 @@ Wipeout.prototype.createMeshFaceMaterial = function(images, vertexColors, side){
 			var texture = new THREE.Texture(images[i]);
 			texture.minFilter = THREE.NearestFilter;
 			texture.magFilter = THREE.NearestFilter;
-			texture.needsUpdate = true;	
-			
+			texture.needsUpdate = true;
+
 			material = new THREE.MeshBasicMaterial({map:texture});
-			
+
 			if( i === 3 && vertexColors === THREE.FaceColors ) {
 				//this is weapon tile. store material, so we can update color later
 				material.vertexColors = THREE.NoColors;
@@ -780,17 +780,17 @@ Wipeout.prototype.createMeshFaceMaterial = function(images, vertexColors, side){
 			else {
 				material.vertexColors = vertexColors;
 			}
-			
-			
+
+
 			material.side = side;
 			material.alphaTest = 0.5;
 		}
 
 		materials.push(material);
 	}
-	
+
 	materials.push(basicMaterial)-1;
-	
+
 	var faceMat = new THREE.MeshFaceMaterial(materials);
 	faceMat.flatMaterialIndex = materials.length-1;
 
@@ -835,12 +835,12 @@ Wipeout.prototype.createTrack = function(files) {
 	var indexEntries = files.textureIndex.byteLength / Wipeout.TrackTextureIndex.byteLength;
 	var textureIndex = Wipeout.TrackTextureIndex.readStructs(files.textureIndex, 0, indexEntries);
 
-	// Extract the big (near) versions of these textures only. The near 
+	// Extract the big (near) versions of these textures only. The near
 	// version is composed of 4x4 32px tiles.
 	var composedImages = [];
 	for( var i = 0; i < textureIndex.length; i++ ) {
 		var idx = textureIndex[i];
-		
+
 		var composedImage = document.createElement('canvas');
 		composedImage.width = 128;
 		composedImage.height = 128;
@@ -873,17 +873,17 @@ Wipeout.prototype.createTrack = function(files) {
 	// Load Faces
 	var faceCount = files.faces.byteLength / Wipeout.TrackFace.byteLength;
 	var faces = Wipeout.TrackFace.readStructs(files.faces, 0, faceCount);
-	
+
 	// Load track texture file (WO2097/WOXL only)
 	if( files.trackTexture ) {
 		var trackTextureCount = files.trackTexture.byteLength / Wipeout.TrackTexture.byteLength;
 		var trackTextures = Wipeout.TrackTexture.readStructs(files.trackTexture, 0, trackTextureCount);
-	
+
 		// Copy data from TEX to TRF structure
 		for( var i = 0; i < faces.length; i++ ) {
 			var f = faces[i];
 			var t = trackTextures[i];
-			
+
 			f.tile = t.tile;
 			f.flags = t.flags;
 		}
@@ -894,13 +894,13 @@ Wipeout.prototype.createTrack = function(files) {
 
 		var color = this.int32ToColor( f.color );
 		var materialIndex = f.tile;
-		
+
 		if(f.flags & Wipeout.TrackFace.FLAGS.BOOST)
 		{
 			//render boost tile as bright blue
 			color = new THREE.Color(0.25, 0.25, 2);
 		}
-		
+
 		geometry.faces.push( new THREE.Face3(f.indices[0], f.indices[1], f.indices[2], null, color, materialIndex) );
 		geometry.faces.push( new THREE.Face3(f.indices[2], f.indices[3], f.indices[0], null, color, materialIndex) );
 
@@ -911,8 +911,8 @@ Wipeout.prototype.createTrack = function(files) {
 			new THREE.Vector2(0+flipx, 0)
 		]);
 		geometry.faceVertexUvs[0].push([
-			new THREE.Vector2(0+flipx, 0), 
-			new THREE.Vector2(1-flipx, 0), 
+			new THREE.Vector2(0+flipx, 0),
+			new THREE.Vector2(1-flipx, 0),
 			new THREE.Vector2(1-flipx, 1)
 		]);
 	}
@@ -922,9 +922,17 @@ Wipeout.prototype.createTrack = function(files) {
 	this.scene.add( model );
 
 
-	this.createCameraSpline(files.sections, faces, geometry.vertices);
+	// this.createCameraSpline(files.sections, faces, geometry.vertices);
+	this.getFinishLineSectionPosition(files.sections);
 };
 
+// ----------------------------------------------------------------------------
+// Get finish line section
+
+Wipeout.prototype.getFinishLineSectionPosition = function(buffer) {
+	var sectionCount = buffer.byteLength / Wipeout.TrackSection.byteLength;
+	var sections = Wipeout.TrackSection.readStructs(buffer, 0, sectionCount);
+}
 
 // ----------------------------------------------------------------------------
 // Extract a camera from the track section file (.TRS)
@@ -942,23 +950,23 @@ Wipeout.prototype.createCameraSpline = function(buffer, faces, vertices) {
 		var s = sections[index];
 		if(s.flags & Wipeout.TrackSection.FLAGS.JUMP)
 			jumpIndexes.push(cameraPoints.length);
-		
+
 		var pos = this.getSectionPosition(s, faces, vertices);
 		cameraPoints.push(pos);
-		
+
 		index = s.next;
 	} while(index > 0 && index < sections.length);
-	
+
 	// Second curve, take junctions when possible
 	index = 0;
 	do {
 		var s = sections[index];
 		if(s.flags & Wipeout.TrackSection.FLAGS.JUMP)
 			jumpIndexes.push(cameraPoints.length);
-		
+
 		var pos = this.getSectionPosition(s, faces, vertices);
 		cameraPoints.push(pos);
-		
+
 		// Get next section, look for junctions
 		if(s.nextJunction != -1 && (sections[s.nextJunction].flags & Wipeout.TrackSection.FLAGS.JUNCTION_START)) {
 			index = s.nextJunction;
@@ -967,27 +975,27 @@ Wipeout.prototype.createCameraSpline = function(buffer, faces, vertices) {
 			index = s.next;
 		}
 	} while(index > 0 && index < sections.length);
-	
+
 	//extend path near jumps by adding tangent vector
 	for(var i = 0 ; i < jumpIndexes.length ; i++ ) {
 		var index = jumpIndexes[i];
-		
+
 		var jumpPoint = cameraPoints[index];
 		var tangent = jumpPoint.clone().sub(cameraPoints[(index+cameraPoints.length-1)%cameraPoints.length]);
 		var lengthNext = cameraPoints[(index+1)%cameraPoints.length].clone().sub(jumpPoint).length();
-		
+
 		jumpPoint.add(tangent.setLength(lengthNext/4));
 	}
-	
+
 	this.cameraSpline = new THREE.HermiteCurve3(cameraPoints, 0.5, 0.0);
-	
+
 	// Increase arc length subdivisions to get constant camera speed during jumps.
 	// This prevent camera going too fast due imprecise length distance estimations.
 	this.cameraSpline.__arcLengthDivisions = 20000;
 
 	// Draw the Camera Spline
 	// this.scene.add( new THREE.Mesh(
-	// 	new THREE.TubeGeometry(this.cameraSpline, cameraPoints.length, 50, 5, true), 
+	// 	new THREE.TubeGeometry(this.cameraSpline, cameraPoints.length, 50, 5, true),
 	// 	new THREE.MeshBasicMaterial({color: 0xff00ff})
 	// ));
 };
@@ -1009,7 +1017,7 @@ Wipeout.prototype.getSectionPosition = function(section, faces, vertices) {
 			}
 		}
 	}
-	
+
 	position.divideScalar(verticescount);
 	return position;
 }
@@ -1044,33 +1052,33 @@ Wipeout.prototype.loadTrack = function( path, loadTEXFile ) {
 	this.loadBinaries(trackFiles, function(files) { that.createTrack(files); });
 };
 
-
+// Only two tracks usefull for dev
 Wipeout.Tracks = {};
 Wipeout.Tracks.Wipeout = [
 	{path: "WIPEOUT/TRACK02", name: "Altima VII - Venom"},
 	{path: "WIPEOUT/TRACK03", name: "Altima VII - Rapier"},
-	{path: "WIPEOUT/TRACK04", name: "Karbonis V - Venom"},
-	{path: "WIPEOUT/TRACK05", name: "Karbonis V - Rapier"},
-	{path: "WIPEOUT/TRACK01", name: "Terramax - Venom"},
-	{path: "WIPEOUT/TRACK06", name: "Terramax - Rapier"},
-	{path: "WIPEOUT/TRACK12", name: "Korodera - Venom"},
-	{path: "WIPEOUT/TRACK07", name: "Korodera - Rapier"},
-	{path: "WIPEOUT/TRACK08", name: "Arridos IV - Venom"},
-	{path: "WIPEOUT/TRACK11", name: "Arridos IV - Rapier"},
-	{path: "WIPEOUT/TRACK09", name: "Silverstream - Venom"},
-	{path: "WIPEOUT/TRACK13", name: "Silverstream - Rapier"},
-	{path: "WIPEOUT/TRACK10", name: "Firestar - Venom"},
-	{path: "WIPEOUT/TRACK14", name: "Firestar - Rapier"}
+	// {path: "WIPEOUT/TRACK04", name: "Karbonis V - Venom"},
+	// {path: "WIPEOUT/TRACK05", name: "Karbonis V - Rapier"},
+	// {path: "WIPEOUT/TRACK01", name: "Terramax - Venom"},
+	// {path: "WIPEOUT/TRACK06", name: "Terramax - Rapier"},
+	// {path: "WIPEOUT/TRACK12", name: "Korodera - Venom"},
+	// {path: "WIPEOUT/TRACK07", name: "Korodera - Rapier"},
+	// {path: "WIPEOUT/TRACK08", name: "Arridos IV - Venom"},
+	// {path: "WIPEOUT/TRACK11", name: "Arridos IV - Rapier"},
+	// {path: "WIPEOUT/TRACK09", name: "Silverstream - Venom"},
+	// {path: "WIPEOUT/TRACK13", name: "Silverstream - Rapier"},
+	// {path: "WIPEOUT/TRACK10", name: "Firestar - Venom"},
+	// {path: "WIPEOUT/TRACK14", name: "Firestar - Rapier"}
 ];
 
 Wipeout.Tracks.Wipeout2097 = [
-	{path: "WIPEOUT2/TRACK01", name: "Talon's Reach", hasTEXFile: true},
-	{path: "WIPEOUT2/TRACK08", name: "Sagarmatha", hasTEXFile: true},
-	{path: "WIPEOUT2/TRACK13", name: "Valparaiso", hasTEXFile: true},
-	{path: "WIPEOUT2/TRACK20", name: "Phenitia Park", hasTEXFile: true},
-	{path: "WIPEOUT2/TRACK02", name: "Gare d'Europa", hasTEXFile: true},
-	{path: "WIPEOUT2/TRACK17", name: "Odessa Keys", hasTEXFile: true},
-	{path: "WIPEOUT2/TRACK06", name: "Vostok Island", hasTEXFile: true},
-	{path: "WIPEOUT2/TRACK07", name: "Spilskinanke", hasTEXFile: true},
-	{path: "WIPEOUT2/TRACK04", name: "Unfinished Track"},
+	// {path: "WIPEOUT2/TRACK01", name: "Talon's Reach", hasTEXFile: true},
+	// {path: "WIPEOUT2/TRACK08", name: "Sagarmatha", hasTEXFile: true},
+	// {path: "WIPEOUT2/TRACK13", name: "Valparaiso", hasTEXFile: true},
+	// {path: "WIPEOUT2/TRACK20", name: "Phenitia Park", hasTEXFile: true},
+	// {path: "WIPEOUT2/TRACK02", name: "Gare d'Europa", hasTEXFile: true},
+	// {path: "WIPEOUT2/TRACK17", name: "Odessa Keys", hasTEXFile: true},
+	// {path: "WIPEOUT2/TRACK06", name: "Vostok Island", hasTEXFile: true},
+	// {path: "WIPEOUT2/TRACK07", name: "Spilskinanke", hasTEXFile: true},
+	// {path: "WIPEOUT2/TRACK04", name: "Unfinished Track"},
 ];

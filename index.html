@@ -4,6 +4,7 @@
 		<title>WipEout (PSX) – Model Viewer</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="shortcut icon" href="faisar.jpg">
 		<style>
 			body {
 				color: #ccc;
@@ -17,7 +18,7 @@
 				text-decoration: none;
 			}
 			a:hover {
-				text-decoration: underline;	
+				text-decoration: underline;
 			}
 			canvas {
 				display: block;
@@ -39,12 +40,12 @@
 	</head>
 	<body>
 		<div id="head">
-			WipEout (PSX) – Model Viewer 
+			WipEout (PSX) – Model Viewer
 			&nbsp; Scene: <select id="sceneSelect"></select>
 			&nbsp; Camera: <a href="#" id="freeCam">Free</a> / <a href="#" id="flyCam">Fly-Through</a>
 			&nbsp; Music: <a href="#" id="musicPlay">Play</a> / <a href="#" id="musicPause">Pause</a>
 			<div id="headRight">
-				Read: 
+				Read:
 				<a href="http://phoboslab.org/log/2015/04/reverse-engineering-wipeout-psx">
 					Reverse Engineering WipEout
 				</a>
@@ -55,7 +56,8 @@
 		<script src="three.js"></script>
 		<script src="orbit-controls.js"></script>
 		<script src="js-struct.js"></script>
-		<script src="HermiteCurve3.js"></script>
+		<!-- Useless for the moment -->
+		<!-- <script src="HermiteCurve3.js"></script> -->
 		<script src="wipeout.js"></script>
 
 		<script>
@@ -82,7 +84,7 @@
 				option.value = loadingFunctions.length;
 				option.innerHTML = name;
 				parent.appendChild(option);
-				
+
 				loadingFunctions.push(func);
 			};
 
@@ -148,7 +150,7 @@
 					objects: 'WIPEOUT2/COMMON/TERRY.PRM'
 				}, function(files) { viewer.createScene(files, {scale: 16, space:9600}); });
 			});
-			
+
 			addOption(groupWipeout2097, 'Weird Ships', function(viewer){
 				viewer.clear();
 				viewer.loadBinaries({
