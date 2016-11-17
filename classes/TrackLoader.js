@@ -88,6 +88,8 @@ TrackLoader.prototype.createScene = function(files, modify) {
 // ----------------------------------------------------------------------------
 // Add a track from TRV, TRF, CMP and TTF files to the scene
 TrackLoader.prototype.createTrack = function(files, callback) {
+  Wipeout.track = {};
+
 	var rawImages = this.unpackImages(files.textures);
 	var images = rawImages.map(this.readImage.bind(this));
 
@@ -564,7 +566,7 @@ TrackLoader.prototype.getFinishLineSectionPosition = function(buffer, faces, ver
 	var sectionCount = buffer.byteLength / TrackLoader.TrackSection.byteLength;
 	var sections = TrackLoader.TrackSection.readStructs(buffer, 0, sectionCount);
 
-  console.log("Longueur sections: " + sections.length);
+  Wipeout.track.sections = sections;
 
 	return this.getSectionPosition(sections[15], faces, vertices);
 }

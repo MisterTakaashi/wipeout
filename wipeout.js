@@ -44,13 +44,14 @@ Wipeout.prototype.loadRace = function(path, hasTEXFile) {
 Wipeout.prototype.placePilots = function() {
 	var finishLine = this.trackLoader.finishLine;
 
-	var geometry = new THREE.BoxGeometry( 1000, 1000, 1000 );
-	var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
-	var cube = new THREE.Mesh( geometry, material );
-	console.log(finishLine);
-	cube.position.set(finishLine.x, finishLine.y, finishLine.z);
-	console.log(cube.position);
-	this.scene.add( cube );
+	this.playerShip = new Ship(this.scene, finishLine);
+	this.playerShip.setControls();
+
+	this.controls.target = this.playerShip.mesh.position;
+
+	this.camera.position.x = this.playerShip.mesh.position.x;
+	this.camera.position.y = this.playerShip.mesh.position.y + 1200;
+	this.camera.position.z = this.playerShip.mesh.position.z + 4000;
 }
 
 Wipeout.prototype.resize = function() {
@@ -74,6 +75,9 @@ Wipeout.prototype.animate = function() {
 
 	// Default Orbit camera
 	this.controls.update();
+	if (this.playerShip){
+		this.playerShip.move();
+	}
 	this.rotateSpritesToCamera(this.camera);
 	this.renderer.render( this.scene, this.camera );
 };
