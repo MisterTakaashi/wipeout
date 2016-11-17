@@ -8,7 +8,7 @@ var TrackLoader = function(scene, sprites){
 
 // ----------------------------------------------------------------------------
 // Load a track, create and draw the level asked
-TrackLoader.prototype.loadTrack = function(path, loadTEXFile) {
+TrackLoader.prototype.loadTrack = function(path, loadTEXFile, callback) {
   var that = this;
   this.loadBinaries({
     textures: path+'/SCENE.CMP',
@@ -33,7 +33,7 @@ TrackLoader.prototype.loadTrack = function(path, loadTEXFile) {
     trackFiles.trackTexture = path+'/TRACK.TEX';
   }
 
-  this.loadBinaries(trackFiles, function(files) { that.createTrack(files); });
+  this.loadBinaries(trackFiles, function(files) { that.createTrack(files, callback); });
 }
 
 // ----------------------------------------------------------------------------
@@ -87,7 +87,7 @@ TrackLoader.prototype.createScene = function(files, modify) {
 
 // ----------------------------------------------------------------------------
 // Add a track from TRV, TRF, CMP and TTF files to the scene
-TrackLoader.prototype.createTrack = function(files) {
+TrackLoader.prototype.createTrack = function(files, callback) {
 	var rawImages = this.unpackImages(files.textures);
 	var images = rawImages.map(this.readImage.bind(this));
 
@@ -182,7 +182,11 @@ TrackLoader.prototype.createTrack = function(files) {
 	this.scene.add( model );
 
 	// this.createCameraSpline(files.sections, faces, geometry.vertices);
-	// var pos = this.getFinishLineSectionPosition(files.sections, faces, geometry.vertices);
+	this.finishLine = this.getFinishLineSectionPosition(files.sections, faces, geometry.vertices);
+
+  if (callback){
+    callback();
+  }
 };
 
 // ----------------------------------------------------------------------------
@@ -553,6 +557,37 @@ TrackLoader.prototype.createMeshFaceMaterial = function(images, vertexColors, si
 
 	return faceMat;
 };
+
+// ----------------------------------------------------------------------------
+// Get finish line position
+TrackLoader.prototype.getFinishLineSectionPosition = function(buffer, faces, vertices) {
+	var sectionCount = buffer.byteLength / TrackLoader.TrackSection.byteLength;
+	var sections = TrackLoader.TrackSection.readStructs(buffer, 0, sectionCount);
+
+  console.log("Longueur sections: " + sections.length);
+
+	return this.getSectionPosition(sections[15], faces, vertices);
+}
+
+// ----------------------------------------------------------------------------
+// Get track section center position from track vertices
+TrackLoader.prototype.getSectionPosition = function(section, faces, vertices) {
+	var verticescount = 0;
+	var position = new THREE.Vector3();
+	for(var i = section.firstFace; i < section.firstFace+section.numFaces; i++ ) {
+		var face = faces[i];
+		if (face.flags & TrackLoader.TrackFace.FLAGS.TRACK) {
+			for(var j = 0 ; j < face.indices.length ; j++) {
+				var vertex = vertices[face.indices[j]];
+				position.add(vertex);
+				verticescount++;
+			}
+		}
+	}
+
+	position.divideScalar(verticescount);
+	return position;
+}
 
 // ----------------------------------------------------------------------------
 // TrackLoader Data Types

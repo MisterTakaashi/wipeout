@@ -24,17 +24,10 @@ Wipeout.prototype.clear = function() {
 	this.camera.position.set( 0, 10000, 50000 );
 	this.camera.rotation.order = 'YZX';
 
-	// this.controls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
-	// this.controls.damping = 0.2;
-	// this.controls.zoomSpeed = 2;
+	this.controls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
+	this.controls.damping = 0.2;
+	this.controls.zoomSpeed = 2;
 
-	// Add Camera for fly through
-	this.splineCamera = new THREE.PerspectiveCamera( 84, window.innerWidth / window.innerHeight, 64, 2048576 );
-	this.splineCamera.currentLookAt = new THREE.Vector3(0,0,0);
-	this.splineCamera.roll = 0;
-	this.splineCamera.rotation.order = 'YZX';
-
-	this.cameraSpline = null;
 	this.sceneMaterial = {};
 	this.trackMaterial = null;
 	this.weaponTileMaterial = null;
@@ -43,15 +36,29 @@ Wipeout.prototype.clear = function() {
 	this.ticks = 0;
 };
 
+Wipeout.prototype.loadRace = function(path, hasTEXFile) {
+	var that = this;
+	viewer.trackLoader.loadTrack(path, hasTEXFile, function(files) { that.placePilots(); });
+}
+
+Wipeout.prototype.placePilots = function() {
+	var finishLine = this.trackLoader.finishLine;
+
+	var geometry = new THREE.BoxGeometry( 1000, 1000, 1000 );
+	var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+	var cube = new THREE.Mesh( geometry, material );
+	console.log(finishLine);
+	cube.position.set(finishLine.x, finishLine.y, finishLine.z);
+	console.log(cube.position);
+	this.scene.add( cube );
+}
+
 Wipeout.prototype.resize = function() {
 	this.width = window.innerWidth;
 	this.height = window.innerHeight;
 
 	this.camera.aspect = this.width / this.height;
 	this.camera.updateProjectionMatrix();
-
-	this.splineCamera.aspect = this.width / this.height;
-	this.splineCamera.updateProjectionMatrix();
 
 	this.renderer.setSize( window.innerWidth, window.innerHeight );
 }
@@ -66,7 +73,7 @@ Wipeout.prototype.animate = function() {
 	}
 
 	// Default Orbit camera
-	// this.controls.update();
+	this.controls.update();
 	this.rotateSpritesToCamera(this.camera);
 	this.renderer.render( this.scene, this.camera );
 };
@@ -88,35 +95,6 @@ Wipeout.prototype.updateWeaponMaterial = function(time) {
 	var colorB = new THREE.Color(colors[(index+1)%colors.length]);
 	this.weaponTileMaterial.color = colorA.lerp(colorB, alpha).multiplyScalar(1.5);
 };
-
-// ----------------------------------------------------------------------------
-// Get finish line position
-Wipeout.prototype.getFinishLineSectionPosition = function(buffer, faces, vertices) {
-	var sectionCount = buffer.byteLength / Wipeout.TrackSection.byteLength;
-	var sections = Wipeout.TrackSection.readStructs(buffer, 0, sectionCount);
-
-	return this.getSectionPosition(sections[0], faces, vertices);
-}
-
-// ----------------------------------------------------------------------------
-// Get track section center position from track vertices
-Wipeout.prototype.getSectionPosition = function(section, faces, vertices) {
-	var verticescount = 0;
-	var position = new THREE.Vector3();
-	for(var i = section.firstFace; i < section.firstFace+section.numFaces; i++ ) {
-		var face = faces[i];
-		if (face.flags & Wipeout.TrackFace.FLAGS.TRACK) {
-			for(var j = 0 ; j < face.indices.length ; j++) {
-				var vertex = vertices[face.indices[j]];
-				position.add(vertex);
-				verticescount++;
-			}
-		}
-	}
-
-	position.divideScalar(verticescount);
-	return position;
-}
 
 // Only two tracks usefull for dev
 Wipeout.Tracks = {};
