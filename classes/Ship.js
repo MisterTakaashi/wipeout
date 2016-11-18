@@ -9,6 +9,9 @@ var Ship = function(scene, position) {
 	this.mesh.position.set(position.x, position.y + this.geometry.parameters.height/2, position.z);
 
 	scene.add(this.mesh);
+
+  this.caster = new THREE.Raycaster();
+  this.isInCollision = false;
 }
 
 Ship.prototype.setControls = function() {
@@ -62,6 +65,8 @@ Ship.prototype.setControls = function() {
 };
 
 Ship.prototype.move = function() {
+  this.collisions();
+
   if (this.controls.up) {
     this.mesh.translateZ(this.speed);
   }
@@ -73,5 +78,38 @@ Ship.prototype.move = function() {
   }
   if (this.controls.right) {
     this.mesh.rotateY(-Math.PI / 100);
+  }
+}
+
+Ship.prototype.collisions = function() {
+  var collisions;
+  var i;
+  var distance = 100;
+  var obstacles = Wipeout.track.mesh;
+
+  this.isInCollision = false;
+
+  var originPoint = this.mesh.position.clone();
+  for (var vertexIndex = 0; vertexIndex < this.mesh.geometry.vertices.length; vertexIndex++)
+	{
+		var localVertex = this.mesh.geometry.vertices[vertexIndex].clone();
+		var globalVertex = localVertex.applyMatrix4( this.mesh.matrix );
+		var directionVector = globalVertex.sub( this.mesh.position );
+
+		var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
+		var collisionResults = ray.intersectObject( obstacles );
+		if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ){
+      console.log("Ok !");
+      this.isInCollision = true;
+      for (var i = 0; i < collisionResults[0].object.material.materials.length; i++) {
+        collisionResults[0].object.material.materials[i].color.set( 0xff0000 );
+      }
+    }
+	}
+
+  if (!this.isInCollision){
+    for (var i = 0; i < Wipeout.track.mesh.material.materials.length; i++) {
+      Wipeout.track.mesh.material.materials[i].color.set( 0xffffff );
+    }
   }
 }

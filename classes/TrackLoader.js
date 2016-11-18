@@ -183,6 +183,8 @@ TrackLoader.prototype.createTrack = function(files, callback) {
 	model.add(mesh);
 	this.scene.add( model );
 
+  Wipeout.track.mesh = mesh;
+
 	// this.createCameraSpline(files.sections, faces, geometry.vertices);
 	this.finishLine = this.getFinishLineSectionPosition(files.sections, faces, geometry.vertices);
 
