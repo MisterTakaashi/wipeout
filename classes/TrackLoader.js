@@ -163,6 +163,8 @@ TrackLoader.prototype.createTrack = function(files, callback) {
 			color = new THREE.Color(0.25, 0.25, 2);
 		}
 
+    // console.log(f.indices);
+
 		geometry.faces.push( new THREE.Face3(f.indices[0], f.indices[1], f.indices[2], null, color, materialIndex) );
 		geometry.faces.push( new THREE.Face3(f.indices[2], f.indices[3], f.indices[0], null, color, materialIndex) );
 

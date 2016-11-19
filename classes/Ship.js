@@ -99,11 +99,14 @@ Ship.prototype.collisions = function() {
 		var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
 		var collisionResults = ray.intersectObject( obstacles );
 		if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ){
-      console.log("Ok !");
       this.isInCollision = true;
       for (var i = 0; i < collisionResults[0].object.material.materials.length; i++) {
         collisionResults[0].object.material.materials[i].color.set( 0xff0000 );
       }
+
+      // console.log(collisionResults[0]);
+
+      this.controls.up = false;
     }
 	}
 
