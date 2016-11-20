@@ -34,6 +34,9 @@ Wipeout.prototype.clear = function() {
 
 	this.startTime = Date.now();
 	this.ticks = 0;
+
+	window.scene = this.scene;
+	window.THREE = THREE;
 };
 
 Wipeout.prototype.loadRace = function(path, hasTEXFile) {

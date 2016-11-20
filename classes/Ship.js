@@ -10,8 +10,35 @@ var Ship = function(scene, position) {
 
 	scene.add(this.mesh);
 
-  this.caster = new THREE.Raycaster();
   this.isInCollision = false;
+
+  var material = new THREE.LineBasicMaterial({
+  	color: 0x0000ff
+  });
+
+  var geometry = new THREE.Geometry();
+  for (var vertexIndex = 0; vertexIndex < this.mesh.geometry.vertices.length; vertexIndex++)
+	{
+    var localVertex = this.mesh.geometry.vertices[vertexIndex].clone();
+    var globalVertex = localVertex.applyMatrix4( this.mesh.matrix );
+		var directionVector = globalVertex.sub( this.mesh.position );
+
+    geometry.vertices.push(
+      globalVertex.clone()
+    );
+  }
+
+  var line = new THREE.Line( geometry, material );
+  scene.add( line );
+
+  console.log(line.position);
+  console.log(this.mesh.position);
+  line.position.set(this.mesh.position.x * 2, this.mesh.position.y * 2, this.mesh.position.z * 2);
+  console.log(line.position);
+
+  // Comment fait pour aliner le vaisseau à la bonne hauteur:
+  // Mettre un raycaster sous le vaisseau d'une hauteur conséquente (Debug avec un cube)
+  // Tester sur toutes les boucles la collision avec ce raycaster et utiliser point (Vector3) de l'objet collisionné pour aligner la hauteur du vaisseau
 }
 
 Ship.prototype.setControls = function() {
@@ -89,26 +116,42 @@ Ship.prototype.collisions = function() {
 
   this.isInCollision = false;
 
-  var originPoint = this.mesh.position.clone();
-  for (var vertexIndex = 0; vertexIndex < this.mesh.geometry.vertices.length; vertexIndex++)
-	{
-		var localVertex = this.mesh.geometry.vertices[vertexIndex].clone();
-		var globalVertex = localVertex.applyMatrix4( this.mesh.matrix );
-		var directionVector = globalVertex.sub( this.mesh.position );
+  this.floorCaster = new THREE.Raycaster(this.mesh.position.clone(), new THREE.Vector3(0, -1, 0).normalize());
 
-		var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
-		var collisionResults = ray.intersectObject( obstacles );
-		if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ){
-      this.isInCollision = true;
-      for (var i = 0; i < collisionResults[0].object.material.materials.length; i++) {
-        collisionResults[0].object.material.materials[i].color.set( 0xff0000 );
-      }
+  // console.log(this.floorCaster);
 
-      // console.log(collisionResults[0]);
-
-      this.controls.up = false;
+  var floorResult = this.floorCaster.intersectObject(obstacles);
+  if ( floorResult.length > 0 ){
+    for (var i = 0; i < floorResult[0].object.material.materials.length; i++) {
+      floorResult[0].object.material.materials[i].color.set( 0xff00ff );
     }
-	}
+    this.isInCollision = true;
+  }
+
+  // var originPoint = this.mesh.position.clone();
+  // for (var vertexIndex = 0; vertexIndex < this.mesh.geometry.vertices.length; vertexIndex++)
+	// {
+	// 	var localVertex = this.mesh.geometry.vertices[vertexIndex].clone();
+	// 	var globalVertex = localVertex.applyMatrix4( this.mesh.matrix );
+	// 	var directionVector = globalVertex.sub( this.mesh.position );
+  //
+  //   // console.log(localVertex);
+  //   // console.log(globalVertex);
+  //   // console.log(directionVector);
+  //
+	// 	var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
+	// 	var collisionResults = ray.intersectObject( obstacles );
+	// 	if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ){
+  //     this.isInCollision = true;
+  //     for (var i = 0; i < collisionResults[0].object.material.materials.length; i++) {
+  //       collisionResults[0].object.material.materials[i].color.set( 0xff0000 );
+  //     }
+  //
+  //     // console.log(collisionResults[0]);
+  //
+  //     this.controls.up = false;
+  //   }
+	// }
 
   if (!this.isInCollision){
     for (var i = 0; i < Wipeout.track.mesh.material.materials.length; i++) {

@@ -81,6 +81,7 @@ TrackLoader.prototype.createScene = function(files, modify) {
 		if( modify && modify.space ) {
 			model.position.add({x: (i + 0.5 - objects.length/2)*modify.space, y:0, z: 0});
 		}
+    model.name = "Sprite deco";
 		this.scene.add( model );
 	}
 };
@@ -183,6 +184,7 @@ TrackLoader.prototype.createTrack = function(files, callback) {
 
 	var mesh = new THREE.Mesh(geometry, this.trackMaterial);
 	model.add(mesh);
+  model.name = "Track";
 	this.scene.add( model );
 
   Wipeout.track.mesh = mesh;
