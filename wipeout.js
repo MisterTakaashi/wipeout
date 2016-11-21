@@ -17,6 +17,9 @@ Wipeout.prototype.clear = function() {
 	this.scene = new THREE.Scene();
 	this.sprites = [];
 
+	var light = new THREE.AmbientLight( 0xffffff ); // soft white light
+	this.scene.add( light );
+
 	this.trackLoader = new TrackLoader(this.scene, this.sprites);
 
 	// Add Camera and controls for orbit
@@ -48,7 +51,7 @@ Wipeout.prototype.placePilots = function() {
 	var finishLine = this.trackLoader.finishLine;
 
 	this.playerShip = new Ship(this.scene, finishLine);
-	this.playerShip.setControls();
+	// this.playerShip.setControls();
 
 	this.controls.target = this.playerShip.mesh.position;
 
