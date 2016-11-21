@@ -122,36 +122,33 @@ Ship.prototype.collisions = function() {
 
   var floorResult = this.floorCaster.intersectObject(obstacles);
   if ( floorResult.length > 0 ){
-    for (var i = 0; i < floorResult[0].object.material.materials.length; i++) {
-      floorResult[0].object.material.materials[i].color.set( 0xff00ff );
-    }
-    this.isInCollision = true;
+    this.mesh.position.y = this.mesh.position.y - (floorResult[0].distance - 500) + 200;
   }
 
-  // var originPoint = this.mesh.position.clone();
-  // for (var vertexIndex = 0; vertexIndex < this.mesh.geometry.vertices.length; vertexIndex++)
-	// {
-	// 	var localVertex = this.mesh.geometry.vertices[vertexIndex].clone();
-	// 	var globalVertex = localVertex.applyMatrix4( this.mesh.matrix );
-	// 	var directionVector = globalVertex.sub( this.mesh.position );
-  //
-  //   // console.log(localVertex);
-  //   // console.log(globalVertex);
-  //   // console.log(directionVector);
-  //
-	// 	var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
-	// 	var collisionResults = ray.intersectObject( obstacles );
-	// 	if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ){
-  //     this.isInCollision = true;
-  //     for (var i = 0; i < collisionResults[0].object.material.materials.length; i++) {
-  //       collisionResults[0].object.material.materials[i].color.set( 0xff0000 );
-  //     }
-  //
-  //     // console.log(collisionResults[0]);
-  //
-  //     this.controls.up = false;
-  //   }
-	// }
+  var originPoint = this.mesh.position.clone();
+  for (var vertexIndex = 0; vertexIndex < this.mesh.geometry.vertices.length; vertexIndex++)
+	{
+		var localVertex = this.mesh.geometry.vertices[vertexIndex].clone();
+		var globalVertex = localVertex.applyMatrix4( this.mesh.matrix );
+		var directionVector = globalVertex.sub( this.mesh.position );
+
+    // console.log(localVertex);
+    // console.log(globalVertex);
+    // console.log(directionVector);
+
+		var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
+		var collisionResults = ray.intersectObject( obstacles );
+		if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ){
+      this.isInCollision = true;
+      for (var i = 0; i < collisionResults[0].object.material.materials.length; i++) {
+        collisionResults[0].object.material.materials[i].color.set( 0xff0000 );
+      }
+
+      // console.log(collisionResults[0]);
+
+      this.controls.up = false;
+    }
+	}
 
   if (!this.isInCollision){
     for (var i = 0; i < Wipeout.track.mesh.material.materials.length; i++) {
