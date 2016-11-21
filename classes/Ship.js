@@ -123,6 +123,11 @@ Ship.prototype.collisions = function() {
   var floorResult = this.floorCaster.intersectObject(obstacles);
   if ( floorResult.length > 0 ){
     this.mesh.position.y = this.mesh.position.y - (floorResult[0].distance - 500) + 200;
+
+    if (this.lastFaceIndex == undefined || this.lastFaceIndex != floorResult[0].faceIndex){
+      console.log(floorResult[0]);
+      this.lastFaceIndex = floorResult[0].faceIndex;
+    }
   }
 
   var originPoint = this.mesh.position.clone();
@@ -136,10 +141,11 @@ Ship.prototype.collisions = function() {
     // console.log(globalVertex);
     // console.log(directionVector);
 
-		var ray = new THREE.Raycaster( originPoint, directionVector.clone().normalize() );
-		var collisionResults = ray.intersectObject( obstacles );
-		if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ){
+		var ray = new THREE.Raycaster(originPoint, directionVector.clone().normalize());
+		var collisionResults = ray.intersectObject(obstacles);
+		if (collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() && collisionResults[0].face.isTrack != true){
       this.isInCollision = true;
+      console.log(collisionResults[0]);
       for (var i = 0; i < collisionResults[0].object.material.materials.length; i++) {
         collisionResults[0].object.material.materials[i].color.set( 0xff0000 );
       }

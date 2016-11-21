@@ -166,8 +166,24 @@ TrackLoader.prototype.createTrack = function(files, callback) {
 
     // console.log(f.indices);
 
-		geometry.faces.push( new THREE.Face3(f.indices[0], f.indices[1], f.indices[2], null, color, materialIndex) );
-		geometry.faces.push( new THREE.Face3(f.indices[2], f.indices[3], f.indices[0], null, color, materialIndex) );
+    var triangle1 = new THREE.Face3(f.indices[0], f.indices[1], f.indices[2], null, color, materialIndex);
+    var triangle2 = new THREE.Face3(f.indices[2], f.indices[3], f.indices[0], null, color, materialIndex);
+
+    if(f.flags & TrackLoader.TrackFace.FLAGS.TRACK)
+		{
+      triangle1.isTrack = true;
+      triangle2.isTrack = true;
+		}else{
+      triangle1.isTrack = false;
+      triangle2.isTrack = false;
+    }
+
+    // if ((i % 4) == 0){
+    //
+    // }
+
+		geometry.faces.push(triangle1);
+		geometry.faces.push(triangle2);
 
 		var flipx = (f.flags & TrackLoader.TrackFace.FLAGS.FLIP) ? 1: 0;
 		geometry.faceVertexUvs[0].push([
