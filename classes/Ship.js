@@ -19,7 +19,6 @@ var Ship = function(scene, position) {
       that.mesh = null;
       that.mesh = object.children[0]
       that.mesh.position.set(position.x, position.y + that.geometry.parameters.height/2, position.z);
-      console.log(that.mesh);
       that.mesh.scale.set(3, 3, 4);
 			scene.add( that.mesh );
 
@@ -33,6 +32,15 @@ var Ship = function(scene, position) {
       that.colliderBox = that.mesh.children[0];
 
       that.setControls();
+
+      Wipeout.camera = new THREE.PerspectiveCamera( 45, Wipeout.width / Wipeout.height, 64, 2048576 );
+
+      that.mesh.add(Wipeout.camera);
+
+      Wipeout.camera.rotation.y = Math.PI;
+      Wipeout.camera.rotation.x = Math.PI/30;
+      Wipeout.camera.position.y = 150;
+      Wipeout.camera.position.z = -500;
 
       // var material = new THREE.LineBasicMaterial({
       // 	color: 0x0000ff
@@ -67,6 +75,8 @@ var Ship = function(scene, position) {
 }
 
 Ship.prototype.setControls = function() {
+  // Wipeout.orbitControls.target = this.mesh.position;
+
   var keys = { LEFT: "q", UP: "z", RIGHT: "d", BOTTOM: "s" };
 
   this.controls = {
@@ -120,6 +130,10 @@ Ship.prototype.setControls = function() {
 
 Ship.prototype.move = function() {
   this.collisions();
+
+  // if (Wipeout.orbitControls){
+  //   Wipeout.orbitControls.update();
+  // }
 
   if (!this.controls || !this.controls.enabled){
     return;

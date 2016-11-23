@@ -5,8 +5,8 @@ var Wipeout = function(containerId, width, height){
 	this.renderer.setClearColor( 0x000000 );
 	this.container = document.getElementById( containerId );
 	this.container.appendChild( this.renderer.domElement );
-	this.width = width;
-	this.height = height;
+	Wipeout.width = width;
+	Wipeout.height = height;
 
 	window.addEventListener('resize', this.resize.bind(this), true);
 	this.clear();
@@ -23,13 +23,13 @@ Wipeout.prototype.clear = function() {
 	this.trackLoader = new TrackLoader(this.scene, this.sprites);
 
 	// Add Camera and controls for orbit
-	this.camera = new THREE.PerspectiveCamera( 45, this.width / this.height, 64, 2048576 );
-	this.camera.position.set( 0, 10000, 50000 );
-	this.camera.rotation.order = 'YZX';
+	Wipeout.camera = new THREE.PerspectiveCamera( 45, Wipeout.width / Wipeout.height, 64, 2048576 );
+	// Wipeout.camera.position.set( 0, 10000, 50000 );
+	// Wipeout.camera.rotation.order = 'YZX';
 
-	this.controls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
-	this.controls.damping = 0.2;
-	this.controls.zoomSpeed = 2;
+	// Wipeout.orbitControls = new THREE.OrbitControls( Wipeout.camera, this.renderer.domElement );
+	// Wipeout.orbitControls.damping = 0.2;
+	// Wipeout.orbitControls.zoomSpeed = 2;
 
 	this.sceneMaterial = {};
 	this.trackMaterial = null;
@@ -53,19 +53,17 @@ Wipeout.prototype.placePilots = function() {
 	this.playerShip = new Ship(this.scene, finishLine);
 	// this.playerShip.setControls();
 
-	this.controls.target = this.playerShip.mesh.position;
-
-	this.camera.position.x = this.playerShip.mesh.position.x;
-	this.camera.position.y = this.playerShip.mesh.position.y + 1200;
-	this.camera.position.z = this.playerShip.mesh.position.z + 4000;
+	// Wipeout.camera.position.x = this.playerShip.mesh.position.x;
+	// Wipeout.camera.position.y = this.playerShip.mesh.position.y + 1200;
+	// Wipeout.camera.position.z = this.playerShip.mesh.position.z + 4000;
 }
 
 Wipeout.prototype.resize = function() {
-	this.width = window.innerWidth;
-	this.height = window.innerHeight;
+	Wipeout.width = window.innerWidth;
+	Wipeout.height = window.innerHeight;
 
-	this.camera.aspect = this.width / this.height;
-	this.camera.updateProjectionMatrix();
+	Wipeout.camera.aspect = Wipeout.width / Wipeout.height;
+	Wipeout.camera.updateProjectionMatrix();
 
 	this.renderer.setSize( window.innerWidth, window.innerHeight );
 }
@@ -79,13 +77,11 @@ Wipeout.prototype.animate = function() {
 		this.updateWeaponMaterial(time);
 	}
 
-	// Default Orbit camera
-	this.controls.update();
 	if (this.playerShip){
 		this.playerShip.move();
 	}
-	this.rotateSpritesToCamera(this.camera);
-	this.renderer.render( this.scene, this.camera );
+	this.rotateSpritesToCamera(Wipeout.camera);
+	this.renderer.render( this.scene, Wipeout.camera );
 };
 
 Wipeout.prototype.rotateSpritesToCamera = function(camera) {
