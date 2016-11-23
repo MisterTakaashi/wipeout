@@ -175,9 +175,9 @@ Ship.prototype.collisions = function() {
 		var globalVertex = localVertex.applyMatrix4( this.colliderBox.matrix );
 		var directionVector = globalVertex.sub( this.colliderBox.position );
 
-    console.log(localVertex);
-    console.log(globalVertex);
-    console.log(directionVector);
+    // console.log(localVertex);
+    // console.log(globalVertex);
+    // console.log(directionVector);
 
 		var ray = new THREE.Raycaster(originPoint, directionVector.clone().normalize());
 		var collisionResults = ray.intersectObject(obstacles);
